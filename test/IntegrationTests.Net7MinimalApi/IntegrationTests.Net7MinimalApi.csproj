@@ -22,7 +22,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\Net7MinimalApi\Net7MinimalApi.csproj" />
+    <ProjectReference Include="..\..\src\Net7MinimalApi\Net7MinimalApi.csproj" />
     <ProjectReference Include="..\IntegrationTests\IntegrationTests.csproj" />
   </ItemGroup>
 

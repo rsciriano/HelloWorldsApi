@@ -22,7 +22,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\Net7ClassicApi\Net7ClassicApi.csproj" />
+    <ProjectReference Include="..\..\src\Net7ClassicApi\Net7ClassicApi.csproj" />
     <ProjectReference Include="..\IntegrationTests\IntegrationTests.csproj" />
   </ItemGroup>
 
