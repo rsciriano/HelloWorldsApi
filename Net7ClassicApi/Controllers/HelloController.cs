@@ -7,7 +7,7 @@ namespace Net7ClassicApi.Controllers;
 public class HelloController : ControllerBase
 {
     [HttpGet]
-    public string Get(string name)
+    public string Get(string? name)
     {
         return $"Hello {name ?? "world"}!";
     }
