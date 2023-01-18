@@ -1,9 +1,12 @@
-﻿using Microsoft.AspNetCore.Mvc.Testing;
+﻿using AutoFixture;
+using IntegrationTests.Utils;
+using Microsoft.AspNetCore.Mvc.Testing;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 
 namespace IntegrationTests
 {
-    internal class ApiApplication : WebApplicationFactory<Program>
+    internal class ApiApplication<T>: WebApplicationFactory<T> where T: class
     {
         private readonly string _environment;
 
@@ -18,6 +21,8 @@ namespace IntegrationTests
 
             builder.ConfigureServices(services =>
             {
+                services.AddSingleton<Fixture>();
+                services.AddSingleton<TestDataManager>();
             });
 
             return base.CreateHost(builder);

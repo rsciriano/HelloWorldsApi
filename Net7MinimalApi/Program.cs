@@ -16,7 +16,7 @@ if (app.Environment.IsDevelopment())
 }
 app.UseHttpsRedirection();
 
-app.MapGet("api/hello", (string name) => $"Hello {name ?? "world"}!");
+app.MapGet("api/hello", (string? name) => $"Hello {name ?? "world"}!");
 
 app.MapGet("api/worlds", (IWorldRepository repository) =>
 {
@@ -43,7 +43,7 @@ app.MapPut("api/worlds", (World world, IWorldRepository repository) =>
     return repository.Update(world);
 });
 
-app.MapDelete("api/worlds", (int id, IWorldRepository repository) =>
+app.MapDelete("api/worlds/{id:int}", (int id, IWorldRepository repository) =>
 {
     return repository.Delete(id);
 });
