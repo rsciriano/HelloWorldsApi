@@ -11,7 +11,7 @@ namespace IntegrationTests.Endpoints.Worlds;
 public abstract class DeleteWorldShould<T> where T : class
 {
     [Fact]
-    public async Task Return_HTTP200_when_the_world_exist()
+    public async Task Return_HTTP204_when_the_world_exist()
     {
         // Arrange
         var testDataManager = GetRequiredService<TestDataManager>();
@@ -23,7 +23,7 @@ public abstract class DeleteWorldShould<T> where T : class
         var response = await client.DeleteAsync($"/api/worlds/{existingWorld.Id}");
 
         // Assert
-        response.StatusCode.Should().Be(HttpStatusCode.OK);
+        response.StatusCode.Should().Be(HttpStatusCode.NoContent);
     }
 
     TSvr GetRequiredService<TSvr>() where TSvr : notnull

@@ -9,7 +9,7 @@ namespace IntegrationTests.Endpoints.Worlds;
 public abstract class CreateNewWorldShould<T> where T : class
 {
     [Fact]
-    public async Task Return_HTTP200_and_the_new_world_when_the_world_not_exist()
+    public async Task Return_HTTP201_and_the_new_world_content_and_location_when_the_world_not_exist()
     {
         // Arrange
         var worldToBeCreated = new WorldModel { Id = 1, Name = "World 1" };
@@ -20,8 +20,9 @@ public abstract class CreateNewWorldShould<T> where T : class
         var responseContent = await response.Content.ReadFromJsonAsync<WorldModel>();
 
         // Assert
-        response.StatusCode.Should().Be(HttpStatusCode.OK);
+        response.StatusCode.Should().Be(HttpStatusCode.Created);
         responseContent.Should().BeEquivalentTo(worldToBeCreated);
+        response.Headers.Location.Should().Be(new Uri(client.BaseAddress, $"api/worlds/{worldToBeCreated.Id}"));
     }
 
     [Fact]
@@ -39,7 +40,7 @@ public abstract class CreateNewWorldShould<T> where T : class
         var response2 = await client.PostAsJsonAsync("/api/worlds", worldToBeCreated);
 
         // Assert
-        response1.StatusCode.Should().Be(HttpStatusCode.OK);
+        response1.StatusCode.Should().Be(HttpStatusCode.Created);
         responseContent1.Should().BeEquivalentTo(worldToBeCreated);
         response2.StatusCode.Should().Be(HttpStatusCode.InternalServerError);
     }

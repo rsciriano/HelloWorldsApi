@@ -1,5 +1,6 @@
 ﻿using Domain.Aggregates.Worlds;
 using Microsoft.AspNetCore.Mvc;
+using Swashbuckle.AspNetCore.Annotations;
 
 namespace Net7ClassicApi.Controllers;
 
@@ -13,34 +14,76 @@ public class WorldsController : Controller
         _repository = repository ?? throw new ArgumentNullException(nameof(repository));
     }
 
-    [HttpGet]
-    public Task<IEnumerable<World>> GetAll()
+    [HttpGet(Name = "GetAllWorlds")]
+    [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(IEnumerable<World>))]
+    [SwaggerOperation(Tags = new[] { "Worlds" })]
+    public async Task<IActionResult> GetAll()
     {
-        return _repository.GetAll();
+        return Ok(await _repository.GetAll());
     }
-    [HttpGet("{id:int}")]
-    public Task<World?> GetById(int id)
+
+    [HttpGet("{id:int}", Name = "GetWorldById")]
+    [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(World))]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [SwaggerOperation(Tags = new[] { "Worlds" })]
+    public async Task<IActionResult> GetById(int id)
     {
-        return _repository.GetById(id);
+        var world = await _repository.GetById(id);
+
+        if (world == null)
+        {
+            return NotFound();
+        }
+        else
+        {
+            return Ok(world);
+        }
     }
-    [HttpGet("{name:regex(^[[a-zA-Z_-]]+$)}")]
-    public Task<World?> GetByName(string name)
+
+    [HttpGet("{name:regex(^[[a-zA-Z_-]]+$)}", Name = "GetWorldByName")]
+    [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(World))]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [SwaggerOperation(Tags = new[] { "Worlds" })]
+    public async Task<IActionResult> GetByName(string name)
     {
-        return _repository.GetByName(name);
+        var world = await _repository.GetByName(name);
+
+        if (world == null)
+        {
+            return NotFound();
+        }
+        else
+        {
+            return Ok(world);
+        }
     }
-    [HttpPost]
-    public Task<World> Create([FromBody]World world)
+
+    [HttpPost(Name = "CreateWorld")]
+    [ProducesResponseType(StatusCodes.Status201Created, Type = typeof(World))]
+    [SwaggerOperation(Tags = new[] { "Worlds" })]
+    public async Task<IActionResult> Create([FromBody]World world)
     {
-        return _repository.Create(world);
+        return CreatedAtRoute(
+            "GetWorldById",
+            new { id = world.Id },
+            await _repository.Create(world));
     }
-    [HttpPut]
-    public Task<World> Update([FromBody] World world)
-    {
-        return _repository.Update(world);
+
+    [HttpPut(Name = "UpdateWorld")]
+    [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(World))]
+    [SwaggerOperation(Tags = new[] { "Worlds" })]
+    public async Task<IActionResult> Update([FromBody] World world)
+    {        
+        return Ok(await _repository.Update(world));
     }
-    [HttpDelete("{id:int}")]
-    public Task Delete(int id)
+
+    [HttpDelete("{id:int}", Name = "DeleteWorld")]
+    [ProducesResponseType(StatusCodes.Status204NoContent, Type = typeof(World))]
+    [SwaggerOperation(Tags = new[] { "Worlds" })]
+    public async Task<IActionResult> Delete(int id)
     {
-        return _repository.Delete(id);
+        await _repository.Delete(id);
+
+        return NoContent();
     }
 }

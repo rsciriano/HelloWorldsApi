@@ -8,6 +8,13 @@ builder.Services.AddSwaggerGen();
 builder.Services.AddSingleton<IWorldRepository, WorldRepository>();
 
 var app = builder.Build();
+
+if (app.Environment.IsDevelopment())
+{
+    app.UseSwagger();
+    app.UseSwaggerUI();
+}
+app.UseHttpsRedirection();
 app.MapControllers();
 app.Run();
 
