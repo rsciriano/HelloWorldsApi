@@ -80,6 +80,7 @@ app.MapPost("api/worlds", async (WorldModel model, IValidator<WorldModel> valida
     return Results.CreatedAtRoute("GetWorldById", new { id = model.Id }, model);
 })
 .Produces<World>(StatusCodes.Status201Created)
+.Produces<HttpValidationProblemDetails>(StatusCodes.Status400BadRequest)
 .WithName("CreateWorld")
 .WithTags("Worlds");
 
