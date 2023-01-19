@@ -1,12 +1,16 @@
 using Domain.Aggregates.Worlds;
+using FluentValidation;
 using Infractructure.Repositories;
 using Microsoft.AspNetCore.Http.HttpResults;
+using Net7MinimalApi.Extensions;
+using Net7MinimalApi.Models;
 
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.AddSingleton<IWorldRepository, WorldRepository>();
+builder.Services.AddSingleton<IValidator<WorldModel>, WorldModelValidator>();
 
 var app = builder.Build();
 
@@ -63,11 +67,17 @@ app.MapGet("api/worlds/{name:regex(^[a-zA-Z_-]+$)}", async (string name, IWorldR
 .WithName("GetWorldByName")
 .WithTags("Worlds");
 
-app.MapPost("api/worlds", async (World world, IWorldRepository repository) =>
+app.MapPost("api/worlds", async (WorldModel model, IValidator<WorldModel> validator, IWorldRepository repository) =>
 {
-    await repository.Create(world);
+    var validationResult = validator.Validate(model);
+    if (!validationResult.IsValid)
+    {
+        return Results.BadRequest(validationResult.Errors.AsValidationProblemDetails());
+    }
 
-    return Results.CreatedAtRoute("GetWorldById", new { id = world.Id }, world);
+    await repository.Create(model.MapToEntity());
+
+    return Results.CreatedAtRoute("GetWorldById", new { id = model.Id }, model);
 })
 .Produces<World>(StatusCodes.Status201Created)
 .WithName("CreateWorld")

@@ -1,5 +1,6 @@
 ﻿using Domain.Aggregates.Worlds;
 using Microsoft.AspNetCore.Mvc;
+using Net7ClassicApi.Models;
 using Swashbuckle.AspNetCore.Annotations;
 
 namespace Net7ClassicApi.Controllers;
@@ -59,14 +60,19 @@ public class WorldsController : Controller
     }
 
     [HttpPost(Name = "CreateWorld")]
-    [ProducesResponseType(StatusCodes.Status201Created, Type = typeof(World))]
+    [ProducesResponseType(StatusCodes.Status201Created, Type = typeof(WorldModel))]
+    [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(ValidationProblemDetails))]
     [SwaggerOperation(Tags = new[] { "Worlds" })]
-    public async Task<IActionResult> Create([FromBody]World world)
+    public async Task<IActionResult> Create([FromBody]WorldModel model)
     {
-        return CreatedAtRoute(
-            "GetWorldById",
-            new { id = world.Id },
-            await _repository.Create(world));
+        if (!ModelState.IsValid)
+        {
+            return BadRequest(new ValidationProblemDetails(ModelState));
+        }
+
+        await _repository.Create(model.Map());
+
+        return CreatedAtRoute("GetWorldById", new { id = model.Id }, model);
     }
 
     [HttpPut(Name = "UpdateWorld")]
