@@ -67,14 +67,8 @@ app.MapGet("api/worlds/{name:regex(^[a-zA-Z_-]+$)}", async (string name, IWorldR
 .WithName("GetWorldByName")
 .WithTags("Worlds");
 
-app.MapPost("api/worlds", async (WorldModel model, IValidator<WorldModel> validator, IWorldRepository repository) =>
+app.MapPost("api/worlds", async (WorldModel model, IWorldRepository repository) =>
 {
-    var validationResult = validator.Validate(model);
-    if (!validationResult.IsValid)
-    {
-        return Results.BadRequest(validationResult.Errors.AsValidationProblemDetails());
-    }
-
     await repository.Create(model.MapToEntity());
 
     return Results.CreatedAtRoute("GetWorldById", new { id = model.Id }, model);
@@ -82,7 +76,8 @@ app.MapPost("api/worlds", async (WorldModel model, IValidator<WorldModel> valida
 .Produces<World>(StatusCodes.Status201Created)
 .Produces<HttpValidationProblemDetails>(StatusCodes.Status400BadRequest)
 .WithName("CreateWorld")
-.WithTags("Worlds");
+.WithTags("Worlds")
+.WithValidation();
 
 app.MapPut("api/worlds", async (World world, IWorldRepository repository) =>
 {
