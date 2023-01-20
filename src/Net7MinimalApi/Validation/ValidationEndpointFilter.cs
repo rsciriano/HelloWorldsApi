@@ -23,8 +23,9 @@ public class ValidationEndpointFilter : IEndpointFilter
             if (!argumentType.IsClass) continue;
 
             var validatorType = genericValidatorType.MakeGenericType(argumentType);
-
             var validator = (IValidator)_serviceProvider.GetService(validatorType);
+            if (validator is null) continue;
+
             var validationTotextType = typeof(ValidationContext<>).MakeGenericType(argumentType);
             var validationContext = (IValidationContext)Activator.CreateInstance(validationTotextType, argument);
             var validationResult = await validator.ValidateAsync(validationContext);
